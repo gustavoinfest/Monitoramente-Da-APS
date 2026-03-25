@@ -1,0 +1,5 @@
+{
+  "name": "Monitoramento e-SUS APS Sinop",
+  "description": "Painel em tempo real para acompanhamento de atendimentos e diagnósticos (CID/CIAP) nas Unidades de Saúde de Sinop.",
+  "requestFramePermissions": []
+}

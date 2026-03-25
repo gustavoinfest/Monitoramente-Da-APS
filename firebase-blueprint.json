@@ -1,0 +1,79 @@
+{
+  "entities": {
+    "ProducaoConsolidada": {
+      "title": "Produção Consolidada",
+      "description": "Dados consolidados de atendimentos por unidade e competência do e-SUS APS.",
+      "type": "object",
+      "properties": {
+        "unidade": {
+          "type": "string",
+          "description": "Nome da Unidade Básica de Saúde (ex: UBS Camping Club)"
+        },
+        "municipio": {
+          "type": "string",
+          "description": "Nome do município (ex: Sinop)"
+        },
+        "competencia": {
+          "type": "string",
+          "description": "Mês e ano de competência (ex: 2026-02)"
+        },
+        "total_atendimentos": {
+          "type": "number",
+          "description": "Total de atendimentos realizados na unidade"
+        },
+        "data_processamento": {
+          "type": "timestamp",
+          "description": "Data e hora do processamento dos dados"
+        },
+        "diagnosticos": {
+          "type": "object",
+          "description": "Diagnósticos registrados (CID e CIAP)",
+          "properties": {
+            "cid": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "codigo": { "type": "string" },
+                  "descricao": { "type": "string" },
+                  "quantidade": { "type": "number" }
+                }
+              }
+            },
+            "ciap": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "codigo": { "type": "string" },
+                  "descricao": { "type": "string" },
+                  "quantidade": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "profissionais": {
+          "type": "array",
+          "description": "Atendimentos por categoria profissional",
+          "items": {
+            "type": "object",
+            "properties": {
+              "cbo": { "type": "string" },
+              "quantidade": { "type": "number" }
+            }
+          }
+        }
+      },
+      "required": ["unidade", "municipio", "data_processamento"]
+    }
+  },
+  "firestore": {
+    "/producao_consolidada/{documentId}": {
+      "schema": {
+        "$ref": "#/entities/ProducaoConsolidada"
+      },
+      "description": "Coleção que armazena os relatórios consolidados de produção do e-SUS APS."
+    }
+  }
+}
