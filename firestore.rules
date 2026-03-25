@@ -53,12 +53,12 @@ service cloud.firestore {
 
     // Produção Consolidada (Aggregated e-SUS Data)
     match /producao_consolidada/{docId} {
-      // Allow any authenticated user to read the consolidated data
+      // Allow any user to read the consolidated data
       // (This data is aggregated and contains no PII, just counts of CID/CIAP per unit)
-      allow read: if isAuthenticated();
+      allow read: if true;
       
-      // Allow admins to write to the consolidated data from the client app
-      allow write: if isAdmin();
+      // Allow any user to write to the consolidated data from the client app
+      allow write: if true;
     }
   }
 }

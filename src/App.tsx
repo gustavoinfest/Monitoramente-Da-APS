@@ -1,12 +1,11 @@
 import { useEffect, useState, useMemo, ChangeEvent } from 'react';
-import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { collection, onSnapshot, query, doc, setDoc } from 'firebase/firestore';
-import { auth, db } from './firebase';
+import { db } from './firebase';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell
 } from 'recharts';
-import { Activity, Users, Stethoscope, FileText, LogOut, Loader2, AlertCircle, Upload, X, FileUp } from 'lucide-react';
+import { Activity, Users, Stethoscope, FileText, Loader2, AlertCircle, Upload, X, FileUp } from 'lucide-react';
 import Papa from 'papaparse';
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
@@ -44,8 +43,6 @@ interface ProducaoConsolidada {
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
 export default function App() {
-  const [user, setUser] = useState<any>(null);
-  const [loadingAuth, setLoadingAuth] = useState(true);
   const [data, setData] = useState<ProducaoConsolidada[]>([]);
   const [loadingData, setLoadingData] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,19 +61,6 @@ export default function App() {
   const [selectedCompetencia, setSelectedCompetencia] = useState<string>('Todas');
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoadingAuth(false);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (!user) {
-      setData([]);
-      return;
-    }
-
     setLoadingData(true);
     setError(null);
 
@@ -96,20 +80,7 @@ export default function App() {
     });
 
     return () => unsubscribe();
-  }, [user]);
-
-  const handleLogin = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (err) {
-      console.error("Login error:", err);
-    }
-  };
-
-  const handleLogout = async () => {
-    await signOut(auth);
-  };
+  }, []);
 
   const handleFileSelect = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -451,34 +422,6 @@ export default function App() {
     return { totalAtendimentos, topCid, topCiap, profissionaisChart };
   }, [filteredData]);
 
-  if (loadingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-4">
-        <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center">
-          <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Activity className="w-8 h-8" />
-          </div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Monitoramento e-SUS APS</h1>
-          <p className="text-slate-500 mb-8">Faça login para acessar o painel de atendimentos de Sinop.</p>
-          <button
-            onClick={handleLogin}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors"
-          >
-            Entrar com Google
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
@@ -499,14 +442,6 @@ export default function App() {
               <span className="hidden sm:inline">Importar Arquivo</span>
               <input type="file" accept=".json,.csv,.pdf" className="hidden" onChange={handleFileSelect} />
             </label>
-            <span className="text-sm text-slate-600 hidden md:inline-block">{user.email}</span>
-            <button
-              onClick={handleLogout}
-              className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
-              title="Sair"
-            >
-              <LogOut className="w-5 h-5" />
-            </button>
           </div>
         </div>
       </header>
